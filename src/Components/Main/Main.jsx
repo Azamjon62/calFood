@@ -1,25 +1,17 @@
 import { useState } from "react";
 
 function Main() {
-  const [modal, setModal] = useState(true);
-  const [array, setArray] = useState([]);
-  const [array2, setArray2] = useState([]);
+  const [isModalOpen, setModalOpen] = useState(true);
+  const [eatenFood, setEatenFood] = useState([]);
+  const [paidForAll, setPaidForAll] = useState([]);
   const [newPerson, setNewPerson] = useState("");
   const [newFood, setNewFood] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [whoPaid, setWhoPaid] = useState("");
   const [allPrice, setAllPrice] = useState("");
 
-  const [newArray, setNewArray] = useState([]);
-  const [newArray2, setNewArray2] = useState([]);
-
-  // const formatPrice = (price) => {
-  //   return new Intl.NumberFormat({
-  //     style: "currency",
-  //     currency: "UZS",
-  //     minimumFractionDigits: 2,
-  //   }).format(price);
-  // };
+  const [calculatedEatenFood, setCalculatedEatenFood] = useState([]);
+  const [calculatedPaidForAll, setCalculatedPaidForAll] = useState([]);
 
   const handleAdd = () => {
     if (
@@ -27,8 +19,8 @@ function Main() {
       newFood.trim() !== "" &&
       newPrice.trim() !== ""
     ) {
-      setArray((prevArray) => [
-        ...prevArray,
+      setEatenFood((prevItems) => [
+        ...prevItems,
         {
           id: Date.now(),
           name: newPerson,
@@ -39,12 +31,12 @@ function Main() {
       setNewPerson("");
       setNewFood("");
       setNewPrice("");
-      setModal(true);
+      setModalOpen(true);
     }
-    // Add All Paid
+
     if (whoPaid.trim() !== "" && allPrice.trim() !== "") {
-      setArray2((prevArray2) => [
-        ...prevArray2,
+      setPaidForAll((prevPayments) => [
+        ...prevPayments,
         {
           id: Date.now(),
           whoPaidAll: whoPaid,
@@ -53,53 +45,52 @@ function Main() {
       ]);
       setWhoPaid("");
       setAllPrice("");
-      setModal(true);
+      setModalOpen(true);
     }
   };
 
-  const calculatePrice = () => {
-    const hammaItem = array.find((item) => item.name === "hamma");
 
-    if (hammaItem) {
-      const peopleCount = array.length - 1;
-      const hammaValue = parseFloat(hammaItem.price) / peopleCount;
+const calculatePrice = () => {
+  const commonExpenseItem = eatenFood.find((item) => item.name === "common");
 
-      const updatedArray = array.map((item) => {
-        if (item.name !== "hamma") {
+  if (commonExpenseItem) {
+    const peopleCount = eatenFood.length - 1;
+    const commonExpenseValue = parseFloat(commonExpenseItem.price) / peopleCount;
+
+    const updatedItems = eatenFood.map((item) => {
+      if (item.name !== "common") {
+        return {
+          ...item,
+          price: parseFloat(item.price) + commonExpenseValue,
+        };
+      }
+      return item;
+    });
+
+    setCalculatedEatenFood(updatedItems.filter((item) => item.name !== "common"));
+
+    const whoAllPaid = paidForAll.map((item) => item);
+    const allPaid = updatedItems.map((item) => item);
+
+    const resultWhoAllPaid = allPaid.find(
+      (item) => item.name === whoAllPaid[0]?.whoPaidAll
+    );
+
+    if (resultWhoAllPaid) {
+      const updatedPayments = paidForAll.map((item) => {
+        if (resultWhoAllPaid.name === item.whoPaidAll) {
           return {
             ...item,
-            price: parseFloat(item.price) + hammaValue,
+            allPrice: parseFloat(item.allPrice) - resultWhoAllPaid.price,
           };
         }
         return item;
       });
 
-      setNewArray(updatedArray);
-
-      const whoAllPaid = array2.map((item) => item);
-      const allPaid = updatedArray.map((item) => item);
-
-      const resultWhoAllPaid = allPaid.find(
-        (item) => item.name === whoAllPaid[0]?.whoPaidAll
-      );
-
-      if (resultWhoAllPaid) {
-        const updatedArray2 = array2.map((item) => {
-          if (resultWhoAllPaid.name === item.whoPaidAll) {
-            return {
-              ...item,
-              allPrice: 
-                parseFloat(item.allPrice) - resultWhoAllPaid.price
-              
-            };
-          }
-          return item;
-        });
-
-        setNewArray2(updatedArray2);
-      }
+      setCalculatedPaidForAll(updatedPayments);
     }
-  };
+  }
+};
 
   return (
     <div>
@@ -115,7 +106,7 @@ function Main() {
             </tr>
           </thead>
           <tbody>
-            {array.map((item) => (
+            {eatenFood.map((item) => (
               <tr key={item.id}>
                 <td className="border-black border-[1px]">{item.name}</td>
                 <td className="border-black border-[1px]">{item.food}</td>
@@ -128,13 +119,13 @@ function Main() {
         </table>
         <button
           className="bg-black text-white p-[10px] rounded m-[10px]"
-          onClick={() => setModal(!modal)}
+          onClick={() => setModalOpen(!isModalOpen)}
         >
-          {modal ? "Add Item" : "Close Modal"}
+          {isModalOpen ? "Add Item" : "Close Modal"}
         </button>
         <div className="mt-[350px] text-center">
           <table className="m-auto mb-[100px]">
-            {array2.length ? (
+            {paidForAll.length ? (
               <thead>
                 <tr>
                   <th className="w-[320px] border-black border-[1px]">
@@ -150,7 +141,7 @@ function Main() {
             )}
 
             <tbody>
-              {array2.map((item) => (
+              {paidForAll.map((item) => (
                 <tr key={item.id}>
                   <td className="border-[1px] border-black">
                     {item.whoPaidAll}
@@ -170,7 +161,7 @@ function Main() {
         </div>
         <br /> <br /> <br /> <br />
         <table>
-          {newArray.length ? (
+          {calculatedEatenFood.length ? (
             <thead>
               <tr>
                 <th className="w-[320px] border-black border-[1px]">Person</th>
@@ -182,7 +173,7 @@ function Main() {
           )}
 
           <tbody>
-            {newArray.map((item) => (
+            {calculatedEatenFood.map((item) => (
               <tr key={item.id}>
                 <td className="border-black border-[1px]">{item.name}</td>
                 <td className="border-black border-[1px]">
@@ -194,7 +185,7 @@ function Main() {
         </table>
         <br /> <br />
         <table>
-          {newArray2.length ? (
+          {calculatedPaidForAll.length ? (
             <thead>
               <tr>
                 <th className="w-[320px] border-[1px] border-black">
@@ -208,7 +199,7 @@ function Main() {
           )}
 
           <tbody>
-            {newArray2.map((item) => (
+            {calculatedPaidForAll.map((item) => (
               <tr key={item.id}>
                 <td className="border-black border-[1px]">{item.whoPaidAll}</td>
                 <td className="border-black border-[1px]">
@@ -218,9 +209,10 @@ function Main() {
             ))}
           </tbody>
         </table>
+        <br /> <br />
         <div
           className="bg-slate-500 w-[30%] h-[100vh] fixed top-0 right-0"
-          style={{ display: `${modal ? "none" : "block"}` }}
+          style={{ display: `${isModalOpen ? "none" : "block"}` }}
         >
           <h3 className="pl-4 pt-4">New Prices</h3>
           <div className="flex gap-4 flex-wrap flex-col p-4">
@@ -248,7 +240,7 @@ function Main() {
           <div className="flex gap-4 p-4 flex-wrap flex-col">
             <input
               type="text"
-              placeholder="Who pai (optional)"
+              placeholder="Who paid (optional)"
               value={whoPaid}
               onChange={(e) => setWhoPaid(e.target.value)}
             />
