@@ -9,13 +9,20 @@ function Main() {
   const [newPrice, setNewPrice] = useState("");
   const [whoPaid, setWhoPaid] = useState("");
   const [allPrice, setAllPrice] = useState("");
+  const [forAll, setForAll] = useState(false);
 
   const [calculatedEatenFood, setCalculatedEatenFood] = useState([]);
   const [calculatedPaidForAll, setCalculatedPaidForAll] = useState([]);
 
   const handleAdd = () => {
+    let personName = newPerson;
+    if (forAll) {
+      personName = "common";
+    }
+
+
     if (
-      newPerson.trim() !== "" &&
+      personName.trim() !== "" &&
       newFood.trim() !== "" &&
       newPrice.trim() !== ""
     ) {
@@ -23,7 +30,7 @@ function Main() {
         ...prevItems,
         {
           id: Date.now(),
-          name: newPerson,
+          name: personName,
           food: newFood,
           price: newPrice,
         },
@@ -69,28 +76,27 @@ const calculatePrice = () => {
 
     setCalculatedEatenFood(updatedItems.filter((item) => item.name !== "common"));
 
-    const whoAllPaid = paidForAll.map((item) => item);
-    const allPaid = updatedItems.map((item) => item);
+    const updatedPayments = paidForAll.map((payment) => {
+      const matchingItem = updatedItems.find(
+        (item) => item.name === payment.whoPaidAll
+      );
 
-    const resultWhoAllPaid = allPaid.find(
-      (item) => item.name === whoAllPaid[0]?.whoPaidAll
-    );
+      console.log(matchingItem)
+      if (matchingItem) {
+        return {
+          ...payment,
+          allPrice: parseFloat(payment.allPrice) - matchingItem.price,
+        };
+      }
+      return payment;
+    });
 
-    if (resultWhoAllPaid) {
-      const updatedPayments = paidForAll.map((item) => {
-        if (resultWhoAllPaid.name === item.whoPaidAll) {
-          return {
-            ...item,
-            allPrice: parseFloat(item.allPrice) - resultWhoAllPaid.price,
-          };
-        }
-        return item;
-      });
+    setCalculatedPaidForAll(updatedPayments);
 
-      setCalculatedPaidForAll(updatedPayments);
-    }
   }
 };
+
+
 
   return (
     <div>
@@ -216,12 +222,19 @@ const calculatePrice = () => {
         >
           <h3 className="pl-4 pt-4">New Prices</h3>
           <div className="flex gap-4 flex-wrap flex-col p-4">
-            <input
-              type="text"
-              placeholder="Person"
-              value={newPerson}
-              onChange={(e) => setNewPerson(e.target.value)}
-            />
+            <div className="flex gap-[60px]">
+              <input
+                type="text"
+                placeholder="Person"
+                value={forAll ? "common" : newPerson}
+                onChange={(e) => setNewPerson(e.target.value)}
+              />
+              <div>
+                <span>For All</span>
+                <input type="checkbox"  checked={forAll} onChange={() => setForAll(!forAll)}/>
+              </div>
+
+            </div>
             <input
               type="text"
               placeholder="Food"
