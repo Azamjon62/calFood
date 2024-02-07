@@ -1,273 +1,580 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
 function Main() {
   const [isModalOpen, setModalOpen] = useState(true);
-  const [eatenFood, setEatenFood] = useState([]);
-  const [paidForAll, setPaidForAll] = useState([]);
-  const [newPerson, setNewPerson] = useState("");
-  const [newFood, setNewFood] = useState("");
+  const [isInputOpen, setInputOpen] = useState(true);
+  const [foods, setFoods] = useState([]);
+  const [people, setPeople] = useState([]);
+  const [commonFood, setCommonFood] = useState([]);
+  const [newPersonName, setNewPersonName] = useState("");
+  const [newFoodName, setNewFoodName] = useState("");
+  const [numOfFood, setNumOfFood] = useState("");
   const [newPrice, setNewPrice] = useState("");
-  const [whoPaid, setWhoPaid] = useState("");
-  const [allPrice, setAllPrice] = useState("");
-  const [forAll, setForAll] = useState(false);
+  const [paidAmount, setPaidAmount] = useState("");
 
   const [calculatedEatenFood, setCalculatedEatenFood] = useState([]);
   const [calculatedPaidForAll, setCalculatedPaidForAll] = useState([]);
 
-  const handleAdd = () => {
-    let personName = newPerson;
-    if (forAll) {
-      personName = "common";
-    }
+  const addPerson = () => {
+    if (newFoodName.trim() !== "" && newPersonName.trim() !== "") {
+      const newFood = {
+        id: Date.now(),
+        foodName: newFoodName,
+        personItems: [
+          {
+            id: Date.now() + 1,
+            name: newPersonName,
+            numOfFood,
+            price: newPrice,
+            paid: paidAmount,
+          },
+        ],
+      };
 
-
-    if (
-      personName.trim() !== "" &&
-      newFood.trim() !== "" &&
-      newPrice.trim() !== ""
-    ) {
-      setEatenFood((prevItems) => [
-        ...prevItems,
-        {
-          id: Date.now(),
-          name: personName,
-          food: newFood,
-          price: newPrice,
-        },
-      ]);
-      setNewPerson("");
-      setNewFood("");
+      setPeople([...people, ...newFood.personItems]);
+      setFoods([...foods, newFood]);
+      setNewPersonName("");
+      setNewFoodName("");
+      setNumOfFood("");
       setNewPrice("");
-      setModalOpen(true);
+      setPaidAmount("");
     }
+  };
 
-    if (whoPaid.trim() !== "" && allPrice.trim() !== "") {
-      setPaidForAll((prevPayments) => [
-        ...prevPayments,
-        {
-          id: Date.now(),
-          whoPaidAll: whoPaid,
-          allPrice: allPrice,
-        },
-      ]);
-      setWhoPaid("");
-      setAllPrice("");
+  const addPersonItem = (foodId) => {
+    const selectedFood = foods.find((food) => food.id === foodId);
+
+    if (selectedFood) {
+      const updatedFoodItems = selectedFood.personItems.concat({
+        id: Date.now(),
+        name: newPersonName,
+        numOfFood,
+        price: newPrice,
+        paid: paidAmount,
+      });
+
+      const updatedFoods = foods.map((food) => {
+        if (food.id === foodId) {
+          return {
+            ...food,
+            personItems: updatedFoodItems,
+          };
+        }
+        return food;
+      });
+
+      setFoods(updatedFoods);
+
+      const newPersonItem = {
+        id: Date.now(),
+        name: newPersonName,
+        numOfFood,
+        price: newPrice,
+        paid: paidAmount,
+      };
+
+      setPeople((prevPeople) => [...prevPeople, newPersonItem]);
+      setNewFoodName("");
+      setNumOfFood("");
+      setNewPrice("");
+      setPaidAmount("");
+      setPaidAmount("");
       setModalOpen(true);
     }
   };
 
+  const addCommonFoods = () => {
+    const newCommonFood = {
+      id: Date.now(),
+      foodName: newFoodName,
+      numOfFood,
+      price: newPrice,
+      paid: paidAmount,
+    };
 
-const calculatePrice = () => {
-  const commonExpenseItem = eatenFood.find((item) => item.name === "common");
+    setCommonFood([...commonFood, newCommonFood]);
+    setPeople([...people, newCommonFood]);
+    setNewFoodName("");
+    setNumOfFood("");
+    setNewPrice("");
+    setPaidAmount("");
+    setInputOpen(false);
+  };
 
-  if (commonExpenseItem) {
-    const peopleCount = eatenFood.length - 1;
-    const commonExpenseValue = parseFloat(commonExpenseItem.price) / peopleCount;
+  const removePerson = (personId) => {
+    const updatedPeople = foods.filter((food) => food.id !== personId);
+    setFoods(updatedPeople);
+  };
 
-    const updatedItems = eatenFood.map((item) => {
-      if (item.name !== "common") {
-        return {
-          ...item,
-          price: parseFloat(item.price) + commonExpenseValue,
-        };
-      }
-      return item;
-    });
-
-    setCalculatedEatenFood(updatedItems.filter((item) => item.name !== "common"));
-
-    const updatedPayments = paidForAll.map((payment) => {
-      const matchingItem = updatedItems.find(
-        (item) => item.name === payment.whoPaidAll
+  const totalAmount = () => {
+    const totalPeopleAmount = foods.reduce((total, person) => {
+      const personAmount = person.personItems.reduce(
+        (personTotal, foodItem) =>
+          personTotal +
+          parseFloat(foodItem.numOfFood, 10) * parseFloat(foodItem.price),
+        0
       );
 
-      console.log(matchingItem)
-      if (matchingItem) {
+      return total + personAmount;
+    }, 0);
+
+    const totalCommonFoodAmount = commonFood.reduce(
+      (total, foodItem) =>
+        total + parseFloat(foodItem.numOfFood, 10) * parseFloat(foodItem.price),
+      0
+    );
+
+    return totalPeopleAmount + totalCommonFoodAmount;
+  };
+
+  const totalCommonFoodAmount = commonFood.reduce(
+    (total, foodItem) =>
+      total + parseFloat(foodItem.numOfFood, 10) * parseFloat(foodItem.price),
+    0
+  );
+
+  const calculatePrice = () => {
+    if (foods.length) {
+      const updatedItems = foods.flatMap((item) => {
+        if (item.personItems.length) {
+          return item.personItems.map((personItem) => ({
+            id: personItem.id,
+            name: personItem.name,
+            paid: personItem.paid,
+            foodItems: [
+              {
+                id: item.id,
+                foodName: item.foodName,
+                numOfFood: personItem.numOfFood,
+                price: personItem.price,
+              },
+            ],
+          }));
+        }
+        return [];
+      });
+
+      const processedNames = [];
+      const updatedItems2 = updatedItems
+        .map((item, index) => {
+          if (!processedNames.includes(item.name)) {
+            processedNames.push(item.name);
+
+            const matchingElements = updatedItems.filter((element2, i) => {
+              return i !== index && item.name === element2.name;
+            });
+
+            if (matchingElements.length > 0) {
+              const uniqueItem = {
+                ...item,
+                foodItems: [
+                  ...item.foodItems,
+                  ...matchingElements.flatMap(
+                    (matchingElement) => matchingElement.foodItems
+                  ),
+                ],
+              };
+
+              return uniqueItem;
+            } else {
+              return item;
+            }
+          } else {
+            return null;
+          }
+        })
+        .filter(Boolean);
+
+      const commonExpenseValue = totalCommonFoodAmount / updatedItems2.length;
+
+      const updated = updatedItems2.map((item) => {
         return {
-          ...payment,
-          allPrice: parseFloat(payment.allPrice) - matchingItem.price,
+          ...item,
+          foodItems: item.foodItems.map((foodItem, index) => {
+            const updatedPrice =
+              index === 0
+                ? parseInt(foodItem.price) + commonExpenseValue
+                : parseInt(foodItem.price);
+
+            return {
+              ...foodItem,
+              price: updatedPrice,
+            };
+          }),
         };
-      }
-      return payment;
-    });
+      });
 
-    setCalculatedPaidForAll(updatedPayments);
+      setCalculatedEatenFood(updated);
 
-  }
-};
+      const updatedPayments = updatedItems2.map((payment) => {
+        const matchingItem = updated.find((item) => {
+          return item.paid != "";
+        });
 
+        if (matchingItem) {
+          return {
+            ...payment,
+            paid:
+              parseInt(payment.paid) -
+              matchingItem.foodItems.reduce((total, food) => {
+                const itemAmount =
+                  parseInt(food.numOfFood, 10) * parseFloat(food.price);
+                return total + itemAmount;
+              }, 0),
+          };
+        }
+        return payment;
+      });
 
+      setCalculatedPaidForAll(
+        updatedPayments.filter((item) => !isNaN(item.paid))
+      );
+    }
+  };
 
   return (
-    <div>
-      <div className="container relative">
-        <table className="mt-[20px]">
+    <div className="container">
+      <table className="mt-[20px]">
+        <thead>
+          <tr>
+            <th className="w-[320px] border-black border-[1px]">Food</th>
+            <th className="w-[15%]  border-black border-[1px]">Person</th>
+            <th className="w-[50px] border-black border-[1px]">&#8470;</th>
+            <th className="w-[15%] border-black border-[1px]">Price</th>
+            <th className="w-[15%] border-black border-[1px]">Amount</th>
+            <th className="w-[15%] border-black border-[1px]">Paid</th>
+            <th className="w-[15%] "></th>
+          </tr>
+        </thead>
+        <tbody>
+          {foods.map((person) => (
+            <React.Fragment key={person.id}>
+              {person.personItems.map((foodItem, foodIndex) => (
+                <tr key={foodItem.id}>
+                  {foodIndex === 0 && (
+                    <td
+                      className="border-[1px] border-black"
+                      rowSpan={person.personItems.length}
+                    >
+                      {person.foodName}
+                    </td>
+                  )}
+                  <td className="border-[1px] border-black">
+                    {foodIndex === 0 && (
+                      <button
+                        onClick={() => setModalOpen(!isModalOpen)}
+                        className="plus border-none w-[30px] bg-slate-300"
+                      >
+                        +
+                      </button>
+                    )}
+                    {foodItem.name}
+                  </td>
+                  <td className="border-[1px] border-black">
+                    {foodItem.numOfFood}
+                  </td>
+                  <td className="border-[1px] border-black">
+                    {foodItem.price}
+                  </td>
+
+                  {foodIndex == 0 && (
+                    <td
+                      className="border-[1px] border-black"
+                      rowSpan={person.personItems.length}
+                    >
+                      {person.personItems.reduce((total, food) => {
+                        const itemAmount =
+                          parseFloat(food.numOfFood, 10) *
+                          parseFloat(food.price);
+                        return total + itemAmount;
+                      }, 0)}
+                      so&rsquo;m
+                    </td>
+                  )}
+
+                  <td className="border-[1px] border-black">{foodItem.paid}</td>
+                  <td>
+                    {foodIndex === 0 && (
+                      <button onClick={() => removePerson(person.id)}>
+                        Remove
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </React.Fragment>
+          ))}
+        </tbody>
+        <tbody>
+          {!isModalOpen && (
+            <tr>
+              <td></td>
+              <td className="border-[1px] border-black">
+                <input
+                  className="w-[100%]"
+                  type="text"
+                  placeholder="Name"
+                  value={newPersonName}
+                  onChange={(e) => setNewPersonName(e.target.value)}
+                />
+              </td>
+              <td className="border-[1px] border-black">
+                <input
+                  className="w-[100%]"
+                  type="text"
+                  placeholder="Num"
+                  value={numOfFood}
+                  onChange={(e) => setNumOfFood(e.target.value)}
+                />
+              </td>
+              <td className="border-[1px] border-black">
+                <input
+                  className="w-[100%]"
+                  type="number"
+                  placeholder="Price"
+                  value={newPrice}
+                  onChange={(e) => setNewPrice(e.target.value)}
+                />
+              </td>
+              <td></td>
+              <td className="border-[1px] border-black">
+                <input
+                  className="w-[100%]"
+                  type="number"
+                  placeholder="Paid"
+                  value={paidAmount}
+                  onChange={(e) => setPaidAmount(e.target.value)}
+                />
+              </td>
+              <td>
+                <button
+                  className="bg-black text-white w-[100%]"
+                  onClick={() => addPersonItem(foods[foods.length - 1].id)}
+                >
+                  Add Food
+                </button>
+              </td>
+            </tr>
+          )}
+        </tbody>
+        <tbody>
+          <tr>
+            <td className="border-[1px] border-black">
+              <input
+                className="w-[100%]"
+                type="text"
+                placeholder="Food Name"
+                value={newFoodName}
+                onChange={(e) => setNewFoodName(e.target.value)}
+              />
+            </td>
+            <td className="border-[1px] border-black">
+              <input
+                className="w-[100%]"
+                type="text"
+                placeholder="Person Name"
+                value={newPersonName}
+                onChange={(e) => setNewPersonName(e.target.value)}
+              />
+            </td>
+            <td className="border-[1px] border-black">
+              <input
+                className="w-[100%]"
+                type="number"
+                placeholder="Num"
+                value={numOfFood}
+                onChange={(e) => setNumOfFood(e.target.value)}
+              />
+            </td>
+            <td className="border-[1px] border-black">
+              <input
+                className="w-[100%]"
+                type="number"
+                placeholder="Price"
+                value={newPrice}
+                onChange={(e) => setNewPrice(e.target.value)}
+              />
+            </td>
+            <td></td>
+            <td className="border-[1px] border-black">
+              <input
+                className="w-[100%]"
+                type="number"
+                placeholder="Paid"
+                value={paidAmount}
+                onChange={(e) => setPaidAmount(e.target.value)}
+              />
+            </td>
+          </tr>
+        </tbody>
+        <tbody>
+          <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td colSpan={2} className="border border-black">
+              Total: {totalAmount()} so&rsquo;m
+            </td>
+            <td></td>
+          </tr>
+        </tbody>
+        <br /> <br /> <br />
+        <tbody>
+          <tr>
+            <td rowSpan={commonFood.length + 2} className="border border-black">
+              Common Food
+            </td>
+          </tr>
+
+          {commonFood.map((item, index) => (
+            <tr key={item.id}>
+              <td className="border border-black">
+                {index == 0 && (
+                  <button
+                    onClick={() => setInputOpen(!isInputOpen)}
+                    className="plus border-none w-[30px] bg-slate-300"
+                  >
+                    +
+                  </button>
+                )}
+                {item.foodName}
+              </td>
+              <td className="border border-black">{item.numOfFood}</td>
+              <td className="border border-black">{item.price} so&rsquo;m</td>
+              <td className="border border-black">
+                {parseInt(item.numOfFood, 10) * parseInt(item.price)} so&rsquo;m
+              </td>
+            </tr>
+          ))}
+
+          {isInputOpen && (
+            <tr>
+              <td className="border border-black">
+                <input
+                  className="w-[100%]"
+                  type="text"
+                  placeholder="Food"
+                  value={newFoodName}
+                  onChange={(e) => setNewFoodName(e.target.value)}
+                />
+              </td>
+              <td className="border border-black">
+                <input
+                  className="w-[100%]"
+                  type="number"
+                  placeholder="Num"
+                  value={numOfFood}
+                  onChange={(e) => setNumOfFood(e.target.value)}
+                />
+              </td>
+              <td className="border border-black">
+                <input
+                  className="w-[100%]"
+                  type="number"
+                  placeholder="Price"
+                  value={newPrice}
+                  onChange={(e) => setNewPrice(e.target.value)}
+                />
+              </td>
+              <td>
+                <button className="bg-black text-white w-[100%]" onClick={addCommonFoods}>add common food</button>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+
+      <button
+        className="bg-black text-white p-[10px] rounded m-[10px] mt-[30px]"
+        onClick={addPerson}
+      >
+        Add Person
+      </button>
+
+      {calculatedEatenFood.length ? (
+        <table className="mt-[60px]">
           <thead>
             <tr>
               <th className="w-[320px] border-black border-[1px]">Person</th>
-              <th className="w-[200px] mr-[10px] border-black border-[1px]">
-                Food
-              </th>
-              <th className="w-[20%] border-black border-[1px]">Price</th>
+              <th className="w-[15%]  border-black border-[1px]">Food</th>
+              <th className="w-[50px] border-black border-[1px]">&#8470;</th>
+              <th className="w-[15%] border-black border-[1px]">Price</th>
+              <th className="w-[15%] border-black border-[1px]">Will Pay</th>
             </tr>
           </thead>
+
           <tbody>
-            {eatenFood.map((item) => (
-              <tr key={item.id}>
-                <td className="border-black border-[1px]">{item.name}</td>
-                <td className="border-black border-[1px]">{item.food}</td>
-                <td className="border-black border-[1px]">
-                  {item.price} so&rsquo;m
-                </td>
-              </tr>
+            {calculatedEatenFood.map((person) => (
+              <React.Fragment key={person.id}>
+                {person.foodItems.map((foodItem, foodIndex) => (
+                  <tr key={foodItem.id}>
+                    {foodIndex === 0 && (
+                      <td
+                        className="border-[1px] border-black"
+                        rowSpan={person.foodItems.length}
+                      >
+                        {person.name}
+                      </td>
+                    )}
+                    <td className="border-[1px] border-black">
+                      {foodItem.foodName}
+                    </td>
+                    <td className="border-[1px] border-black">
+                      {foodItem.numOfFood}
+                    </td>
+                    <td className="border-[1px] border-black">
+                      {foodItem.price}
+                    </td>
+
+                    {foodIndex == 0 && (
+                      <td
+                        className="border-[1px] border-black"
+                        rowSpan={person.foodItems.length}
+                      >
+                        {person.foodItems.reduce((total, food) => {
+                          const itemAmount =
+                            parseInt(food.numOfFood, 10) *
+                            parseFloat(food.price);
+                          return total + itemAmount;
+                        }, 0)}
+                        so&rsquo;m
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
-        <button
-          className="bg-black text-white p-[10px] rounded m-[10px]"
-          onClick={() => setModalOpen(!isModalOpen)}
-        >
-          {isModalOpen ? "Add Item" : "Close Modal"}
-        </button>
-        <div className="mt-[350px] text-center">
-          <table className="m-auto mb-[100px]">
-            {paidForAll.length ? (
-              <thead>
-                <tr>
-                  <th className="w-[320px] border-black border-[1px]">
-                    Who Paid all
-                  </th>
-                  <th className="w-[200px] mr-[10px] border-black border-[1px]">
-                    Price
-                  </th>
-                </tr>
-              </thead>
-            ) : (
-              ""
-            )}
+      ) : null}
 
-            <tbody>
-              {paidForAll.map((item) => (
-                <tr key={item.id}>
-                  <td className="border-[1px] border-black">
-                    {item.whoPaidAll}
-                  </td>
-                  <td className="border-[1px] border-black">{item.allPrice}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <button
-            className="bg-black text-white p-[10px] rounded"
-            onClick={calculatePrice}
-          >
-            Calculate
-          </button>
-        </div>
-        <br /> <br /> <br /> <br />
-        <table>
-          {calculatedEatenFood.length ? (
-            <thead>
-              <tr>
-                <th className="w-[320px] border-black border-[1px]">Person</th>
-                <th className="w-[20%] border-black border-[1px]">Pay</th>
-              </tr>
-            </thead>
-          ) : (
-            ""
-          )}
-
-          <tbody>
-            {calculatedEatenFood.map((item) => (
-              <tr key={item.id}>
-                <td className="border-black border-[1px]">{item.name}</td>
-                <td className="border-black border-[1px]">
-                  {item.price} so&rsquo;m
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <br /> <br />
-        <table>
-          {calculatedPaidForAll.length ? (
-            <thead>
-              <tr>
-                <th className="w-[320px] border-[1px] border-black">
-                  Who Paid all
-                </th>
-                <th className="w-[20%] border-[1px] border-black">Will get</th>
-              </tr>
-            </thead>
-          ) : (
-            ""
-          )}
-
-          <tbody>
+      {calculatedPaidForAll.length ? (
+        <table className="mt-[50px]">
+          <thead>
+            <tr>
+              <th className="w-[320px] border-black border-[1px]">Person</th>
+              <th className="w-[30%] border-black border-[1px]">Will get</th>
+            </tr>
+          </thead>
+          <tbody className="m-[100px]">
             {calculatedPaidForAll.map((item) => (
               <tr key={item.id}>
-                <td className="border-black border-[1px]">{item.whoPaidAll}</td>
-                <td className="border-black border-[1px]">
-                  {item.allPrice} so&rsquo;m
-                </td>
+                <td className="border-[1px] border-black">{item.name}</td>
+                <td className="border-[1px] border-black">{item.paid}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        <br /> <br />
-        <div
-          className="bg-slate-500 w-[30%] h-[100vh] fixed top-0 right-0"
-          style={{ display: `${isModalOpen ? "none" : "block"}` }}
-        >
-          <h3 className="pl-4 pt-4">New Prices</h3>
-          <div className="flex gap-4 flex-wrap flex-col p-4">
-            <div className="flex gap-[60px]">
-              <input
-                type="text"
-                placeholder="Person"
-                value={forAll ? "common" : newPerson}
-                onChange={(e) => setNewPerson(e.target.value)}
-              />
-              <div>
-                <span>For All</span>
-                <input type="checkbox"  checked={forAll} onChange={() => setForAll(!forAll)}/>
-              </div>
+      ) : null}
 
-            </div>
-            <input
-              type="text"
-              placeholder="Food"
-              value={newFood}
-              onChange={(e) => setNewFood(e.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="Price"
-              value={newPrice}
-              onChange={(e) => setNewPrice(e.target.value)}
-            />
-          </div>
-          <br />
-          <h3 className="pl-4">Who paid</h3>
-          <div className="flex gap-4 p-4 flex-wrap flex-col">
-            <input
-              type="text"
-              placeholder="Who paid (optional)"
-              value={whoPaid}
-              onChange={(e) => setWhoPaid(e.target.value)}
-            />
-            <input
-              type="number"
-              placeholder="All price (optional)"
-              value={allPrice}
-              onChange={(e) => setAllPrice(e.target.value)}
-            />
-            <button className="border-[1px] bg-white" onClick={handleAdd}>
-              Add
-            </button>
-          </div>
-        </div>
+      <div className="mt-[150px] text-center">
+        <button
+          className="bg-black text-white p-[10px] rounded"
+          onClick={calculatePrice}
+        >
+          Calculate
+        </button>
       </div>
     </div>
   );
