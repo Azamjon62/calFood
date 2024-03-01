@@ -7,7 +7,7 @@ function CalculatedEatenFood({ calculatedEatenFood }) {
   return (
     <>
       {calculatedEatenFood.length ? (
-        <table className="mt-[60px]">
+        <table className="mt-[60px] hidden sm:block">
           <thead>
             <tr>
               <th className="w-[320px] border-black border-[1px]">Person</th>

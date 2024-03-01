@@ -3,11 +3,11 @@
 // Person.js
 import React from "react";
 
-function Person({ foods, removePerson, isModalOpen, setModalOpen, addPersonItem, newPersonName, numOfFood, newPrice, paidAmount, setNewPersonName, setNumOfFood, setNewPrice, setPaidAmount, }) {
+function Person({ foods, removePerson, isModalOpen, setModalOpen, addPersonItem, newPersonName, numOfFood, newPrice, paidAmount, setNewPersonName, setNumOfFood, setNewPrice, setPaidAmount}) {
 
   return (
     <>
-      <div className="table-row-group">
+      <div className="table-row-group invisible sm:visible">
         {foods.map((person) => (
           <React.Fragment key={person.id}>
             {person.personItems.map((foodItem, foodIndex) => (
@@ -111,7 +111,7 @@ function Person({ foods, removePerson, isModalOpen, setModalOpen, addPersonItem,
             </div>
             <div className="table-cell">
               <button
-                className="bg-black text-white w-[100%]"
+                className="bg-black text-white w-[100px] "
                 onClick={() => addPersonItem(foods[foods.length - 1].id)}
               >
                 Add person

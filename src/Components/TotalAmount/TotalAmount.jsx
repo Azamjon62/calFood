@@ -4,16 +4,18 @@
 // TotalAmount.js
 import React from "react";
 
-function TotalAmount({ totalAmount }) {
+function TotalAmount({ totalAmount, commonFood, foods }) {
   return (
     <>
-      <tr>
+      <tr className="invisible sm:visible">
         <td></td>
         <td></td>
         <td></td>
-        <td colSpan={2} className="border border-black">
-          Total: {totalAmount()} so&rsquo;m
-        </td>
+        {foods.length > 0 || commonFood.length > 0 ? (
+            <td colSpan={2} className="border border-black">
+              Total: {totalAmount()} so&rsquo;m
+            </td>
+          ) : null}
         <td></td>
       </tr>
     </>

@@ -7,7 +7,7 @@ function CalculatedPaidForAll({ calculatedPaidForAll }) {
   return (
     <>
       {calculatedPaidForAll.length ? (
-        <table className="mt-[50px]">
+        <table className="mt-[50px] hidden sm:block">
           <thead>
             <tr>
               <th className="w-[320px] border-black border-[1px]">Person</th>

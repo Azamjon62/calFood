@@ -40,7 +40,7 @@ function InputForm({
           <input
             className="w-[100%]"
             type="number"
-            placeholder="Num"
+            placeholder="Count"
             value={numOfFood}
             onChange={(e) => setNumOfFood(e.target.value)}
           />
