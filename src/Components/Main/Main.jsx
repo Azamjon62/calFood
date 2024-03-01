@@ -62,16 +62,13 @@ function Main() {
   const [numOfFood, setNumOfFood] = useState("");
   const [newPrice, setNewPrice] = useState("");
   const [paidAmount, setPaidAmount] = useState("");
-
   const [service, setService] = useState("");
 
   const [calculatedEatenFood, setCalculatedEatenFood] = useState([]);
   const [calculatedPaidForAll, setCalculatedPaidForAll] = useState([]);
 
-  console.log(serviceList);
-
   const theme = useTheme();
-  const [value, setValue] = useState(1);
+  const [value, setValue] = useState(0);
   const [expanded, setExpanded] = useState(false);
 
   const handleChangeAccordion = (panel) => (event, isExpanded) => {
@@ -858,6 +855,15 @@ function Main() {
                   </div>
                 )}
               </div>
+
+              <div>
+                {serviceList.map((service) => (
+                  <div key={service.id} className="bg-slate-100 p-[10px] rounded mt-[20px] flex justify-between items-center" >
+                    <h2>Service:</h2>
+                    <p className="text-xl" >{service.percentage} %</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </TabPanel>
 
@@ -938,7 +944,6 @@ function Main() {
       </div>
 
       <div className="mt-[20px] table hidden sm:block">
-        {value != 2 && (
           <div className="table-header-group ">
             <div className="table-row w-auto">
               <div className="w-[320px] border-black border-[1px] table-cell text-center">
@@ -959,11 +964,9 @@ function Main() {
               <div className="w-[15%] border-black border-[1px] table-cell text-center">
                 Paid
               </div>
-              {/* <div className="w-[100px] "></div> */}
+              <div className="w-[100px] "></div>
             </div>
           </div>
-        )}
-        {value != 2 && (
           <Person
             foods={foods}
             removePerson={removePerson}
@@ -979,7 +982,6 @@ function Main() {
             setNewPrice={setNewPrice}
             setPaidAmount={setPaidAmount}
           />
-        )}
         <InputForm
           newPersonName={newPersonName}
           newFoodName={newFoodName}
@@ -994,7 +996,6 @@ function Main() {
         />
         <br /> <br /> <br />
         <br />
-        {value == 1 && (
           <>
             <CommonFood
               commonFood={commonFood}
@@ -1009,14 +1010,11 @@ function Main() {
               newPrice={newPrice}
             />
           </>
-        )}
-        {value != 2 && (
           <TotalAmount
             totalAmount={totalAmount}
             foods={foods}
             commonFood={commonFood}
           />
-        )}
       </div>
 
       <button

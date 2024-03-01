@@ -7,7 +7,7 @@ import React from "react";
 function TotalAmount({ totalAmount, commonFood, foods }) {
   return (
     <>
-      <tr className="invisible sm:visible">
+      <tr className="hidden sm:block">
         <td></td>
         <td></td>
         <td></td>

@@ -7,7 +7,7 @@ function Person({ foods, removePerson, isModalOpen, setModalOpen, addPersonItem,
 
   return (
     <>
-      <div className="table-row-group invisible sm:visible">
+      <div className="table-row-group hidden sm:block">
         {foods.map((person) => (
           <React.Fragment key={person.id}>
             {person.personItems.map((foodItem, foodIndex) => (
