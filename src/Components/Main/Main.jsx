@@ -110,44 +110,48 @@ function Main() {
   };
 
   const addPersonItem = (foodId) => {
-    const selectedFood = foods.find((food) => food.id === foodId);
+    const selectedFoodIndex = foods.findIndex((food) => food.id === foodId);
 
-    if (selectedFood) {
-      const updatedFoodItems = selectedFood.personItems.concat({
-        id: Date.now(),
-        name: newPersonName,
-        numOfFood,
-        price: newPrice,
-        paid: paidAmount,
-      });
+    if (selectedFoodIndex !== -1) {
+      const selectedFood = foods[selectedFoodIndex];
 
-      const updatedFoods = foods.map((food) => {
-        if (food.id === foodId) {
-          return {
-            ...food,
-            personItems: updatedFoodItems,
-          };
-        }
-        return food;
-      });
+      if (
+        newPersonName.trim() !== "" &&
+        numOfFood.trim() !== "" &&
+        newPrice.trim() !== ""
+      ) {
+        const updatedFoodItems = selectedFood.personItems.concat({
+          id: Date.now(),
+          name: newPersonName,
+          numOfFood,
+          price: newPrice,
+          paid: paidAmount,
+        });
 
-      setFoods(updatedFoods);
+        const updatedFoods = [...foods];
+        updatedFoods[selectedFoodIndex] = {
+          ...selectedFood,
+          personItems: updatedFoodItems,
+        };
 
-      const newPersonItem = {
-        id: Date.now(),
-        name: newPersonName,
-        numOfFood,
-        price: newPrice,
-        paid: paidAmount,
-      };
+        setFoods(updatedFoods);
 
-      setPeople((prevPeople) => [...prevPeople, newPersonItem]);
-      setNewFoodName("");
-      setNumOfFood("");
-      setNewPrice("");
-      setPaidAmount("");
-      setNewPersonName("");
-      setModalOpen(true);
+        const newPersonItem = {
+          id: Date.now(),
+          name: newPersonName,
+          numOfFood,
+          price: newPrice,
+          paid: paidAmount,
+        };
+
+        setPeople((prevPeople) => [...prevPeople, newPersonItem]);
+        setNewFoodName("");
+        setNumOfFood("");
+        setNewPrice("");
+        setPaidAmount("");
+        setNewPersonName("");
+        setModalOpen(true);
+      }
     }
   };
 
@@ -358,7 +362,6 @@ function Main() {
                 <Typography sx={{ width: "33%", flexShrink: 0 }}>
                   <h3>Add Food</h3>
                 </Typography>
-                {/* <Typography sx={{ color: 'text.secondary' }}>with person</Typography> */}
               </AccordionSummary>
               <AccordionDetails sx={{ p: 0 }}>
                 <Typography>
@@ -450,62 +453,6 @@ function Main() {
                     >
                       Add common food
                     </Button>
-
-                    {/* {!isModalOpen && <hr className=" mt-4 bg-black h-[1px]" />} */}
-
-                    {/* <div className="table-row-group ">
-                      {!isModalOpen && (
-                        <div className="flex flex-col gap-5">
-                          <h4>Add Person</h4>
-                          <div className="border-[1px] border-black table-cell">
-                            <input
-                              className="w-[100%]"
-                              type="text"
-                              placeholder="Name"
-                              value={newPersonName}
-                              onChange={(e) => setNewPersonName(e.target.value)}
-                            />
-                          </div>
-                          <div className="border-[1px] border-black table-cell">
-                            <input
-                              className="w-[100%]"
-                              type="text"
-                              placeholder="Num"
-                              value={numOfFood}
-                              onChange={(e) => setNumOfFood(e.target.value)}
-                            />
-                          </div>
-                          <div className="border-[1px] border-black table-cell">
-                            <input
-                              className="w-[100%]"
-                              type="number"
-                              placeholder="Price"
-                              value={newPrice}
-                              onChange={(e) => setNewPrice(e.target.value)}
-                            />
-                          </div>
-                          <div className="border-[1px] border-black table-cell">
-                            <input
-                              className="w-[100%]"
-                              type="number"
-                              placeholder="Paid"
-                              value={paidAmount}
-                              onChange={(e) => setPaidAmount(e.target.value)}
-                            />
-                          </div>
-                          <div className="table-cell">
-                            <button
-                              className="bg-black text-white p-[5px] rounded w-[100%]"
-                              onClick={() =>
-                                addPersonItem(foods[foods.length - 1].id)
-                              }
-                            >
-                              Add Person
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div> */}
                   </div>
                 </Typography>
               </AccordionDetails>
@@ -598,22 +545,21 @@ function Main() {
                         />
                       </Box>
 
-                      <Button
+                      {/* <Button
                         variant="contained"
                         className="w-[100%]"
                         disableElevation
-                        onClick={() =>
-                          addPersonItem(foods[foods.length - 1].id)
-                        }
+                        // onClick={() => addPersonItem(foods.length - 1)}
                       >
                         Add Person
-                      </Button>
+                      </Button> */}
                     </div>
                   </Typography>
                 </AccordionDetails>
               </Accordion>
             ) : null}
 
+            <br /> <hr /> <br />
             <div>
               {foods.map((person) => (
                 <React.Fragment key={person.id}>
@@ -650,20 +596,52 @@ function Main() {
                               so&rsquo;m
                             </p>
                           )}
-
                           <p>
                             Paid: {foodItem.paid.length ? foodItem.paid : 0}
                           </p>
                         </div>
                         {foodIndex === person.personItems.length - 1 && (
-                          <div>
-                            <Button
-                              variant="outlined"
-                              className="text-center w-[100%]"
+                          <Accordion
+                            disableGutters 
+                            sx={{
+                              background: "#f1f5f9",
+                              width: "100%",
+                              boxShadow: 0,
+                              "::before": {
+                                content: "none"
+                              },
+                              
+                            }}
+                            expanded={expanded === "panel2"}
+                            onChange={handleChangeAccordion("panel2")}
+                          >
+                            <AccordionSummary
+                            
+                              sx={{
+                                backgroundColor: "#f1f5f9",
+                                height: 0,
+                                p: 0,
+                              }}
+                              aria-controls="panel2bh-content"
+                              id="panel2bh-header"
                             >
-                              Add Person
-                            </Button>
-                          </div>
+                              <Typography
+                                sx={{
+                                  width: "100%",
+                                }}
+                              >
+                                <Button
+                                  variant="outlined"
+                                  className="text-center w-[100%]"
+                                  onClick={() => addPersonItem(person.id)}
+                                >
+                                  Add Person
+                                </Button>
+                              </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails sx={{ p: 0 }}>
+                            </AccordionDetails>
+                          </Accordion>
                         )}
                       </div>
                     ))}
@@ -858,9 +836,12 @@ function Main() {
 
               <div>
                 {serviceList.map((service) => (
-                  <div key={service.id} className="bg-slate-100 p-[10px] rounded mt-[20px] flex justify-between items-center" >
+                  <div
+                    key={service.id}
+                    className="bg-slate-100 p-[10px] rounded mt-[20px] flex justify-between items-center"
+                  >
                     <h2>Service:</h2>
-                    <p className="text-xl" >{service.percentage} %</p>
+                    <p className="text-xl">{service.percentage} %</p>
                   </div>
                 ))}
               </div>
@@ -944,44 +925,44 @@ function Main() {
       </div>
 
       <div className="mt-[20px] table hidden sm:block">
-          <div className="table-header-group ">
-            <div className="table-row w-auto">
-              <div className="w-[320px] border-black border-[1px] table-cell text-center">
-                Food
-              </div>
-              <div className="w-[15%]  border-black border-[1px] table-cell text-center">
-                Person
-              </div>
-              <div className="w-[50px] border-black border-[1px] table-cell text-center">
-                &#8470;
-              </div>
-              <div className="w-[15%] border-black border-[1px] table-cell text-center">
-                Price
-              </div>
-              <div className="w-[15%] border-black border-[1px] table-cell text-center">
-                Amount
-              </div>
-              <div className="w-[15%] border-black border-[1px] table-cell text-center">
-                Paid
-              </div>
-              <div className="w-[100px] "></div>
+        <div className="table-header-group ">
+          <div className="table-row w-auto">
+            <div className="w-[320px] border-black border-[1px] table-cell text-center">
+              Food
             </div>
+            <div className="w-[15%]  border-black border-[1px] table-cell text-center">
+              Person
+            </div>
+            <div className="w-[50px] border-black border-[1px] table-cell text-center">
+              &#8470;
+            </div>
+            <div className="w-[15%] border-black border-[1px] table-cell text-center">
+              Price
+            </div>
+            <div className="w-[15%] border-black border-[1px] table-cell text-center">
+              Amount
+            </div>
+            <div className="w-[15%] border-black border-[1px] table-cell text-center">
+              Paid
+            </div>
+            <div className="w-[100px] "></div>
           </div>
-          <Person
-            foods={foods}
-            removePerson={removePerson}
-            isModalOpen={isModalOpen}
-            setModalOpen={setModalOpen}
-            addPersonItem={addPersonItem}
-            newPersonName={newPersonName}
-            numOfFood={numOfFood}
-            newPrice={newPrice}
-            paidAmount={paidAmount}
-            setNewPersonName={setNewPersonName}
-            setNumOfFood={setNumOfFood}
-            setNewPrice={setNewPrice}
-            setPaidAmount={setPaidAmount}
-          />
+        </div>
+        <Person
+          foods={foods}
+          removePerson={removePerson}
+          isModalOpen={isModalOpen}
+          setModalOpen={setModalOpen}
+          addPersonItem={addPersonItem}
+          newPersonName={newPersonName}
+          numOfFood={numOfFood}
+          newPrice={newPrice}
+          paidAmount={paidAmount}
+          setNewPersonName={setNewPersonName}
+          setNumOfFood={setNumOfFood}
+          setNewPrice={setNewPrice}
+          setPaidAmount={setPaidAmount}
+        />
         <InputForm
           newPersonName={newPersonName}
           newFoodName={newFoodName}
@@ -996,25 +977,25 @@ function Main() {
         />
         <br /> <br /> <br />
         <br />
-          <>
-            <CommonFood
-              commonFood={commonFood}
-              addCommonFoods={addCommonFoods}
-              setInputOpen={setInputOpen}
-              isInputOpen={isInputOpen}
-              setNewFoodName={setNewFoodName}
-              setNumOfFood={setNumOfFood}
-              setNewPrice={setNewPrice}
-              newFoodName={newFoodName}
-              numOfFood={numOfFood}
-              newPrice={newPrice}
-            />
-          </>
-          <TotalAmount
-            totalAmount={totalAmount}
-            foods={foods}
+        <>
+          <CommonFood
             commonFood={commonFood}
+            addCommonFoods={addCommonFoods}
+            setInputOpen={setInputOpen}
+            isInputOpen={isInputOpen}
+            setNewFoodName={setNewFoodName}
+            setNumOfFood={setNumOfFood}
+            setNewPrice={setNewPrice}
+            newFoodName={newFoodName}
+            numOfFood={numOfFood}
+            newPrice={newPrice}
           />
+        </>
+        <TotalAmount
+          totalAmount={totalAmount}
+          foods={foods}
+          commonFood={commonFood}
+        />
       </div>
 
       <button
