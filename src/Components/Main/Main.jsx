@@ -19,7 +19,9 @@ import Accordion from "@mui/material/Accordion";
 import AccordionDetails from "@mui/material/AccordionDetails";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-
+import { InputAdornment } from "@mui/material";
+import FunctionsRoundedIcon from "@mui/icons-material/FunctionsRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
@@ -316,6 +318,7 @@ function Main() {
       setCalculatedPaidForAll(
         updatedPayments.filter((item) => !isNaN(item.paid))
       );
+      setValue(2);
     }
   };
 
@@ -338,23 +341,28 @@ function Main() {
         </AppBar>
 
         <SwipeableViews
-          className="mt-[40px]"
+          className="mt-[55px]"
           axis={theme.direction === "rtl" ? "x-reverse" : "x"}
           index={value}
           onChangeIndex={handleChangeIndex}
         >
           <TabPanel value={value} index={0} dir={theme.direction}>
             <Accordion
+              // disableGutters
               sx={{
-                background: "#eaeaea",
+                p: 1,
+                background: "#f1f5f9",
                 width: "100%",
                 boxShadow: 0,
+                borderRadius: "5px",
               }}
               expanded={expanded === "panel1"}
               onChange={handleChangeAccordion("panel1")}
             >
               <AccordionSummary
-                sx={{ p: 0 }}
+                sx={{
+                  p: 1,
+                }}
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1bh-content"
                 id="panel1bh-header"
@@ -363,7 +371,7 @@ function Main() {
                   <h3>Add Food</h3>
                 </Typography>
               </AccordionSummary>
-              <AccordionDetails sx={{ p: 0 }}>
+              <AccordionDetails sx={{ p: 0, mb: 3 }}>
                 <Typography>
                   <div className="flex flex-col gap-5">
                     <Box
@@ -451,7 +459,7 @@ function Main() {
                       disableElevation
                       onClick={addPerson}
                     >
-                      Add common food
+                      Add food
                     </Button>
                   </div>
                 </Typography>
@@ -460,25 +468,35 @@ function Main() {
 
             {foods.length ? (
               <Accordion
+                // disableGutters
                 sx={{
-                  background: "#eaeaea",
+                  p: 1,
+                  mt: 1.5,
+                  mb: 5,
+                  background: "#f1f5f9",
                   width: "100%",
                   boxShadow: 0,
+                  "::before": {
+                    content: "none",
+                  },
+                  borderRadius: "5px",
                 }}
                 expanded={expanded === "panel2"}
                 onChange={handleChangeAccordion("panel2")}
               >
                 <AccordionSummary
-                  sx={{ p: 0 }}
+                  sx={{
+                    p: 1,
+                  }}
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel2bh-content"
                   id="panel2bh-header"
                 >
-                  <Typography sx={{ width: "33%", flexShrink: 0 }}>
+                  <Typography sx={{ width: "43%", flexShrink: 0 }}>
                     <h3>Add Person</h3>
                   </Typography>
                 </AccordionSummary>
-                <AccordionDetails sx={{ p: 0 }}>
+                <AccordionDetails sx={{ p: 0, mb: 3 }}>
                   <Typography>
                     <div className="flex flex-col gap-5">
                       <Box
@@ -505,9 +523,9 @@ function Main() {
                       >
                         <TextField
                           fullWidth
-                          label="Num"
+                          label="Count"
                           id="fullWidth"
-                          type="text"
+                          type="Number"
                           value={numOfFood}
                           onChange={(e) => setNumOfFood(e.target.value)}
                         />
@@ -523,7 +541,7 @@ function Main() {
                           fullWidth
                           label="Price"
                           id="fullWidth"
-                          type="text"
+                          type="Number"
                           value={newPrice}
                           onChange={(e) => setNewPrice(e.target.value)}
                         />
@@ -539,7 +557,7 @@ function Main() {
                           fullWidth
                           label="Paid"
                           id="fullWidth"
-                          type="text"
+                          type="Number"
                           value={paidAmount}
                           onChange={(e) => setPaidAmount(e.target.value)}
                         />
@@ -559,19 +577,22 @@ function Main() {
               </Accordion>
             ) : null}
 
-            <br /> <hr /> <br />
+            <hr />
             <div>
+              {foods.length ? <h2>Items</h2> : null}
               {foods.map((person) => (
                 <React.Fragment key={person.id}>
                   <div className="bg-slate-100 p-[10px] rounded mt-[20px]">
                     <div className="flex justify-between h-14 items-center">
                       <h2>{person.foodName}</h2>
                       <p className=" font-semibold text-base">
-                        <span className="text-xs">Price:</span>{" "}
-                        {
-                          person.personItems[person.personItems.length - 1]
-                            .price
-                        }
+                        Amt:{" "}
+                        {person.personItems.reduce((total, food) => {
+                          const itemAmount =
+                            parseInt(food.numOfFood, 10) * parseInt(food.price);
+                          return total + itemAmount;
+                        }, 0)}{" "}
+                        so&rsquo;m
                       </p>
                     </div>
                     <hr />
@@ -579,44 +600,36 @@ function Main() {
                       <div key={foodItem.id}>
                         <hr />
                         <div className="flex justify-between mt-[15px] mb-[10px]">
-                          <h3>Name: {foodItem.name}</h3>
-                          <p>Count: {foodItem.numOfFood} </p>
+                          <h3>{foodItem.name}</h3>
+                          <p>x {foodItem.numOfFood} </p>
                         </div>
 
                         <div className="flex justify-between mb-[15px] ">
-                          {foodIndex == person.personItems.length - 1 && (
-                            <p>
-                              Amount:{" "}
-                              {person.personItems.reduce((total, food) => {
-                                const itemAmount =
-                                  parseInt(food.numOfFood, 10) *
-                                  parseInt(food.price);
-                                return total + itemAmount;
-                              }, 0)}{" "}
-                              so&rsquo;m
-                            </p>
-                          )}
+                          <p>Price: {foodItem.price} so&rsquo;m</p>
                           <p>
-                            Paid: {foodItem.paid.length ? foodItem.paid : 0}
+                            {foodItem.paid.length ? (
+                              <span className="text-sm">
+                                Paid: {foodItem.paid} so&rsquo;m
+                              </span>
+                            ) : null}
                           </p>
                         </div>
+
                         {foodIndex === person.personItems.length - 1 && (
                           <Accordion
-                            disableGutters 
+                            disableGutters
                             sx={{
                               background: "#f1f5f9",
                               width: "100%",
                               boxShadow: 0,
                               "::before": {
-                                content: "none"
+                                content: "none",
                               },
-                              
                             }}
                             expanded={expanded === "panel2"}
                             onChange={handleChangeAccordion("panel2")}
                           >
                             <AccordionSummary
-                            
                               sx={{
                                 backgroundColor: "#f1f5f9",
                                 height: 0,
@@ -639,8 +652,7 @@ function Main() {
                                 </Button>
                               </Typography>
                             </AccordionSummary>
-                            <AccordionDetails sx={{ p: 0 }}>
-                            </AccordionDetails>
+                            <AccordionDetails sx={{ p: 0 }}></AccordionDetails>
                           </Accordion>
                         )}
                       </div>
@@ -654,26 +666,31 @@ function Main() {
           <TabPanel value={value} index={1} dir={theme.direction}>
             <div>
               <Accordion
+                // disableGutters
                 sx={{
-                  background: "#eaeaea",
+                  p: 1,
+                  background: "#f1f5f9",
                   width: "100%",
                   boxShadow: 0,
+                  borderRadius: "5px",
                 }}
                 expanded={expanded === "panel3"}
                 onChange={handleChangeAccordion("panel3")}
               >
                 <AccordionSummary
-                  sx={{ p: 0 }}
+                  sx={{
+                    p: 1,
+                  }}
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel3bh-content"
                   id="panel3bh-header"
                 >
-                  <Typography sx={{ width: "53%", flexShrink: 0 }}>
+                  <Typography sx={{ width: "63%", flexShrink: 0 }}>
                     <h3>Add Common Food</h3>
                   </Typography>
                   {/* <Typography sx={{ color: 'text.secondary' }}>with person</Typography> */}
                 </AccordionSummary>
-                <AccordionDetails sx={{ p: 0 }}>
+                <AccordionDetails sx={{ p: 0, mb: 3 }}>
                   <Typography>
                     <div className="flex flex-col gap-5">
                       <Box
@@ -739,16 +756,22 @@ function Main() {
               </Accordion>
 
               <Accordion
+                // disableGutters
                 sx={{
-                  background: "#eaeaea",
+                  background: "#f1f5f9",
                   width: "100%",
                   boxShadow: 0,
+                  p: 1,
+                  mt: 1.5,
+                  "::before": {
+                    content: "none",
+                  },
                 }}
                 expanded={expanded === "panel4"}
                 onChange={handleChangeAccordion("panel4")}
               >
                 <AccordionSummary
-                  sx={{ p: 0 }}
+                  sx={{ p: 1 }}
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls="panel4bh-content"
                   id="panel4bh-header"
@@ -758,7 +781,7 @@ function Main() {
                   </Typography>
                   {/* <Typography sx={{ color: 'text.secondary' }}>with person</Typography> */}
                 </AccordionSummary>
-                <AccordionDetails sx={{ p: 0 }}>
+                <AccordionDetails sx={{ p: 0, mb: 3 }}>
                   <Typography>
                     <div>
                       <Box
@@ -774,6 +797,13 @@ function Main() {
                           type="text"
                           value={service}
                           onChange={(e) => setService(e.target.value)}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="start">
+                                %
+                              </InputAdornment>
+                            ),
+                          }}
                         />
                       </Box>
 
@@ -794,7 +824,7 @@ function Main() {
 
               <div>
                 {commonFood.length > 0 && (
-                  <div className="bg-slate-100 p-[10px] rounded mt-[20px]">
+                  <div className="bg-slate-100 p-[10px] rounded mt-[60px]">
                     <div>
                       <h2
                         rowSpan={commonFood.length + 2}
@@ -807,8 +837,8 @@ function Main() {
                       <div key={food.id}>
                         <hr />
                         <div className="flex justify-between mt-[15px] mb-[10px]">
-                          <h3>Name: {food.foodName}</h3>
-                          <p>Count: {food.numOfFood} </p>
+                          <h3>{food.foodName}</h3>
+                          <p>x {food.numOfFood} </p>
                         </div>
 
                         <div className="flex justify-between mb-[15px]">
@@ -851,18 +881,25 @@ function Main() {
           <TabPanel value={value} index={2} dir={theme.direction}>
             <div>
               <div>
-                {calculatedEatenFood.length ? <h2>Those who pay</h2> : null}
+                {calculatedEatenFood.length ? (
+                  <h2 className="mt-[-5px]" >Those who will pay</h2>
+                ) : null}
                 {calculatedEatenFood.map((person) => (
                   <React.Fragment key={person.id}>
                     <div className="bg-slate-100 p-[10px] rounded mt-[20px]">
                       <div className="flex justify-between h-14 items-center">
                         <h3>{person.name}</h3>
                         <p>
-                          {" "}
-                          <span className="font-bold text-sm">
-                            Will pay:
+                          <span className="text-center">
+                            <FunctionsRoundedIcon />
                           </span>{" "}
-                          {person.foodItems[person.foodItems.length - 1].price}{" "}
+                          {person.foodItems.reduce((total, food) => {
+                            const itemAmount =
+                              parseInt(food.numOfFood, 10) *
+                              parseInt(food.price);
+                            return total + itemAmount;
+                          }, 0)}{" "}
+                          so&rsquo;m
                         </p>
                       </div>
                       {person.foodItems.map((foodItem) => (
@@ -870,24 +907,20 @@ function Main() {
                           <hr />
                           <div className="flex justify-between mt-[15px] mb-[10px]">
                             <p> {foodItem.foodName}</p>
-                            <p>Count: {foodItem.numOfFood} </p>
+                            <p>x {foodItem.numOfFood} </p>
                           </div>
 
                           <div className="flex justify-between mb-[15px]">
                             <p>
-                              <span className="text-sm">Amt:</span>{" "}
-                              {person.foodItems.reduce((total, food) => {
-                                const itemAmount =
-                                  parseInt(food.numOfFood, 10) *
-                                  parseInt(food.price);
-                                return total + itemAmount;
-                              }, 0)}{" "}
-                              so&rsquo;m
+                              <span className="text-sm">Price:</span>{" "}
+                              {foodItem.price} so&rsquo;m
                             </p>
                             <p>
-                              {" "}
-                              <span className="text-sm">Paid:</span>{" "}
-                              {person.paid.length ? person.paid : 0} so&rsquo;m
+                              {person.paid.length ? (
+                                <span className="text-sm">
+                                  Paid: {person.paid} so&rsquo;m
+                                </span>
+                              ) : null}
                             </p>
                           </div>
                         </div>
@@ -909,7 +942,7 @@ function Main() {
                           <p>
                             {" "}
                             <span className="font-bold text-sm">
-                              Will Get:
+                              <AddRoundedIcon />:
                             </span>{" "}
                             {item.paid} so&rsquo;m
                           </p>
