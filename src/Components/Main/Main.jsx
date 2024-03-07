@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import Person from "../Person/Person";
 import CommonFood from "../CommonFood/CommonFood";
@@ -6,7 +7,7 @@ import TotalAmount from "../TotalAmount/TotalAmount";
 import CalculatedEatenFood from "../CalculatedEatenFood/CalculatedEatenFood";
 import CalculatedPaidForAll from "../CalculatedPaidForAll/CalculatedPaidForAll";
 import PropTypes from "prop-types";
-import SwipeableViews from "react-swipeable-views";
+import SwipeableViews from "react-swipeable-views-react-18-fix";
 import { useTheme } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
@@ -52,7 +53,7 @@ function a11yProps(index) {
   };
 }
 
-function Main() {
+function Main({handleNotifyClick}) {
   const [isModalOpen, setModalOpen] = useState(true);
   const [isInputOpen, setInputOpen] = useState(true);
   const [foods, setFoods] = useState([]);
@@ -218,6 +219,7 @@ function Main() {
   );
 
   const calculatePrice = () => {
+    handleNotifyClick()
     if (foods.length) {
       const updatedItems = foods.flatMap((item) => {
         if (item.personItems.length) {
@@ -297,7 +299,7 @@ function Main() {
 
       const updatedPayments = updatedItems2.map((payment) => {
         const matchingItem = updated.find((item) => {
-          return item.paid != "";
+          return item.paid !== "";
         });
 
         if (matchingItem) {
@@ -845,7 +847,7 @@ function Main() {
                           <p>Price: {food.price}</p>
                         </div>
 
-                        {index == commonFood.length - 1 && (
+                        {index === commonFood.length - 1 && (
                           <p className="text-center">
                             Amount:{" "}
                             {commonFood.reduce((total, food) => {

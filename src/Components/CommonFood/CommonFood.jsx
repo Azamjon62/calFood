@@ -29,7 +29,7 @@ function CommonFood({
       {commonFood.map((item, index) => (
         <tr className="table-row" key={item.id}>
           <td className="border border-black flex">
-            {index == 0 && (
+            {index === 0 && (
               <button
                 onClick={() => setInputOpen(!isInputOpen)}
                 className="plus border-none w-[30px] bg-slate-300 hidden sm:block"
@@ -41,7 +41,7 @@ function CommonFood({
           </td>
           <td className="border border-black table-cell">{item.numOfFood}</td>
           <td className="border border-black table-cell">{item.price} so&rsquo;m</td>
-          {index == 0 && (
+          {index === 0 && (
             <td className="border border-black table-cell" rowSpan={commonFood.length}>
               {commonFood.reduce((total, food) => {
                 const itemAmount =
