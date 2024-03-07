@@ -35,6 +35,9 @@ dependencies:
   react-swipeable-views:
     specifier: ^0.14.0
     version: 0.14.0(react@18.2.0)
+  web-vitals:
+    specifier: ^3.5.2
+    version: 3.5.2
 
 devDependencies:
   '@types/react':
@@ -4000,6 +4003,10 @@ packages:
     resolution: {integrity: sha512-rpJyN222KWIvHJ/F53XSZv0Zl/accqHR8et1kpaMTD/fLCRxtV8iX8czMzY7sVZupTI3zcUTg8eycS2kNF9l6w==}
     dependencies:
       loose-envify: 1.4.0
+    dev: false
+
+  /web-vitals@3.5.2:
+    resolution: {integrity: sha512-c0rhqNcHXRkY/ogGDJQxZ9Im9D19hDihbzSQJrsioex+KnFgmMzBiy57Z1EjkhX/+OjyBpclDCzz2ITtjokFmg==}
     dev: false
 
   /websocket-driver@0.7.4:
