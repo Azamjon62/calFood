@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import Person from "../Person/Person";
 import CommonFood from "../CommonFood/CommonFood";
@@ -52,7 +53,7 @@ function a11yProps(index) {
   };
 }
 
-function Main() {
+function Main({handleNotifyClick}) {
   const [isModalOpen, setModalOpen] = useState(true);
   const [isInputOpen, setInputOpen] = useState(true);
   const [foods, setFoods] = useState([]);
@@ -218,6 +219,7 @@ function Main() {
   );
 
   const calculatePrice = () => {
+    handleNotifyClick()
     if (foods.length) {
       const updatedItems = foods.flatMap((item) => {
         if (item.personItems.length) {
