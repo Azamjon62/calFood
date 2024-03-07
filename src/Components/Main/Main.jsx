@@ -7,7 +7,7 @@ import TotalAmount from "../TotalAmount/TotalAmount";
 import CalculatedEatenFood from "../CalculatedEatenFood/CalculatedEatenFood";
 import CalculatedPaidForAll from "../CalculatedPaidForAll/CalculatedPaidForAll";
 import PropTypes from "prop-types";
-import SwipeableViews from "react-swipeable-views";
+import SwipeableViews from "react-swipeable-views-react-18-fix";
 import { useTheme } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
