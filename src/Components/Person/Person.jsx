@@ -39,7 +39,7 @@ function Person({ foods, removePerson, isModalOpen, setModalOpen, addPersonItem,
 
                 <div className="border-[1px] border-black table-cell">{foodItem.price}</div>
 
-                {foodIndex == 0 && (
+                {foodIndex === 0 && (
                   <td
                     className="border-[1px] border-black"
                     rowSpan={person.personItems.length}

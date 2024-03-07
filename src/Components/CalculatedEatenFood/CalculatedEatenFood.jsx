@@ -41,7 +41,7 @@ function CalculatedEatenFood({ calculatedEatenFood }) {
                       {foodItem.price}
                     </td>
 
-                    {foodIndex == 0 && (
+                    {foodIndex === 0 && (
                       <td
                         className="border-[1px] border-black"
                         rowSpan={person.foodItems.length}

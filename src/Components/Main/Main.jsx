@@ -299,7 +299,7 @@ function Main({handleNotifyClick}) {
 
       const updatedPayments = updatedItems2.map((payment) => {
         const matchingItem = updated.find((item) => {
-          return item.paid != "";
+          return item.paid !== "";
         });
 
         if (matchingItem) {
@@ -847,7 +847,7 @@ function Main({handleNotifyClick}) {
                           <p>Price: {food.price}</p>
                         </div>
 
-                        {index == commonFood.length - 1 && (
+                        {index === commonFood.length - 1 && (
                           <p className="text-center">
                             Amount:{" "}
                             {commonFood.reduce((total, food) => {
