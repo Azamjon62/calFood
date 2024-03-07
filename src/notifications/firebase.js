@@ -24,7 +24,7 @@ export const generateToken = async () => {
                 vapidKey: "BFRn5sVJ2PGVDR5JOx8g7TM_Sprd6Rpx0iFhWmpxqNi2KkPLPGFMGPEohu0OGf7lQQFDiCeoOnbCkXcgNml_LA0"
             }).then((currentToken) => {
                 console.log(currentToken);
-                document.getElementById('token').append(currentToken);
+                // document.getElementById('token').append(currentToken);
             });
         }
 }
